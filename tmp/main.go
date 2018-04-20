@@ -1,19 +1,15 @@
 package main
 
-import "time"
+import (
+	_ "github.com/go-sql-driver/mysql"
+)
 
-func foo() int {
-	ch := make(chan int)
-	go func() {
-		select {
-		case ch <- 1:
-		default:
-		}
-	}()
-	time.Sleep(time.Second)
-	return <-ch
-}
+type role uint
+
+const (
+	r1 role = iota
+	r2
+)
 
 func main() {
-	print(foo())
 }

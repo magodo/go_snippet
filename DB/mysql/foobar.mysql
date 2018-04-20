@@ -1,0 +1,212 @@
+-- MySQL dump 10.16  Distrib 10.1.31-MariaDB, for Linux (x86_64)
+--
+-- Host: localhost    Database: foobar
+-- ------------------------------------------------------
+-- Server version	10.1.31-MariaDB
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Current Database: `foobar`
+--
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `foobar` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci */;
+
+USE `foobar`;
+
+--
+-- Table structure for table `Customers`
+--
+
+DROP TABLE IF EXISTS `Customers`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Customers` (
+  `cust_id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `city` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`cust_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `Customers`
+--
+
+LOCK TABLES `Customers` WRITE;
+/*!40000 ALTER TABLE `Customers` DISABLE KEYS */;
+INSERT INTO `Customers` VALUES (1,'Jack','America'),(2,'Rose','America'),(3,'Jay','China'),(4,'Eckehard','Germany'),(5,'Manuel','Germany');
+/*!40000 ALTER TABLE `Customers` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `Orders`
+--
+
+DROP TABLE IF EXISTS `Orders`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Orders` (
+  `order_id` int(11) NOT NULL AUTO_INCREMENT,
+  `order_num` int(11) NOT NULL,
+  `cust_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`order_id`),
+  KEY `cust_id` (`cust_id`),
+  CONSTRAINT `Orders_ibfk_1` FOREIGN KEY (`cust_id`) REFERENCES `Customers` (`cust_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `Orders`
+--
+
+LOCK TABLES `Orders` WRITE;
+/*!40000 ALTER TABLE `Orders` DISABLE KEYS */;
+/*!40000 ALTER TABLE `Orders` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `disk`
+--
+
+DROP TABLE IF EXISTS `disk`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `disk` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `brand` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `size` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `type` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `speed` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `disk`
+--
+
+LOCK TABLES `disk` WRITE;
+/*!40000 ALTER TABLE `disk` DISABLE KEYS */;
+INSERT INTO `disk` VALUES (1,'foo','s','1',1000),(2,'foo','l','1',1000),(3,'foo','m','1',1000),(4,'bar','s','1',1000),(5,'bar','l','1',1000),(6,'bar','m','1',1000);
+/*!40000 ALTER TABLE `disk` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `foo`
+--
+
+DROP TABLE IF EXISTS `foo`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `foo` (
+  `id` int(11) NOT NULL,
+  `name` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `foo`
+--
+
+LOCK TABLES `foo` WRITE;
+/*!40000 ALTER TABLE `foo` DISABLE KEYS */;
+INSERT INTO `foo` VALUES (2,NULL),(7160,NULL);
+/*!40000 ALTER TABLE `foo` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `t`
+--
+
+DROP TABLE IF EXISTS `t`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `t` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `date1` date DEFAULT NULL,
+  `date2` date DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `t`
+--
+
+LOCK TABLES `t` WRITE;
+/*!40000 ALTER TABLE `t` DISABLE KEYS */;
+INSERT INTO `t` VALUES (1,'2018-01-26','2018-01-26'),(2,'2018-01-27','2018-01-26');
+/*!40000 ALTER TABLE `t` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `test_null`
+--
+
+DROP TABLE IF EXISTS `test_null`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `test_null` (
+  `not_null` int(11) NOT NULL,
+  `nullable` int(11) DEFAULT NULL,
+  `unknown` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `test_null`
+--
+
+LOCK TABLES `test_null` WRITE;
+/*!40000 ALTER TABLE `test_null` DISABLE KEYS */;
+INSERT INTO `test_null` VALUES (123,NULL,NULL);
+/*!40000 ALTER TABLE `test_null` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `zoo`
+--
+
+DROP TABLE IF EXISTS `zoo`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `zoo` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `kind` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `age` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `zoo`
+--
+
+LOCK TABLES `zoo` WRITE;
+/*!40000 ALTER TABLE `zoo` DISABLE KEYS */;
+INSERT INTO `zoo` VALUES (4,'大几居','g',3),(5,'发福蝶','g',3),(6,'大穷猫','g',3),(7,'大呛','g',3),(8,'梅发怒','g',3),(9,'墙颈怒','g',4),(19,'小凶许','diudiu',3),(20,'小脑斧','dd',3);
+/*!40000 ALTER TABLE `zoo` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2018-04-18 19:50:19
