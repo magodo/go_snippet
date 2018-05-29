@@ -1,0 +1,9 @@
+May 10 15:15:56 10-19-158-206 kernel: virtio-pci 0000:00:06.0: PCI INT A -> Link[LNKB] -> GSI 11 (level, high) -> IRQ 11
+May 10 15:15:57 10-19-158-206 kernel: vda: vda1
+May 10 15:15:58 10-19-158-206 kernel: input: ImExPS/2 Generic Explorer Mouse as /devices/platform/i8042/serio1/input/input4
+May 10 15:15:59 10-19-158-206 kernel: EXT4-fs (vda1): mounted filesystem with ordered data mode. Opts:
+May 10 15:16:00 10-19-158-206 kernel: dracut: Remounting /dev/vda1 with -o errors=remount-ro,noatime,ro
+May 10 15:16:00 10-19-158-206 kernel: EXT4-fs (vda1): mounted filesystem with ordered data mode. Opts:
+May 10 15:16:00 10-19-158-206 kernel: dracut: Mounted root filesystem /dev/vda1
+May 10 15:16:00 10-19-158-206 kernel: Refined TSC clocksource calibration: 2194.921 MHz.
+May 10 15:16:01 10-19-158-206 kernel: SELinux:  Disabled at runtime.

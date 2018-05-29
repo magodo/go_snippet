@@ -142,3 +142,17 @@ func UpdateMgrDB(db *sql.DB, table string, id int64, fields []string, values ...
 	}
 	return
 }
+
+func ShowSQLStmt(stmt string, args ...interface{}) (fullStmt string, err error) {
+	if strings.Count(stmt, "?") != len(args) {
+		err = errors.New(fmt.Sprintf("malformed sql statement %s, should not contain '?' as non-place holder", stmt))
+		return
+	}
+
+	fullStmt = stmt
+	for i := 0; i < len(args); i++ {
+		fullStmt = strings.Replace(fullStmt, "?", fmt.Sprintf("%q", args[i]), 1)
+	}
+
+	return
+}
