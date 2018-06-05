@@ -3,6 +3,7 @@ package mylib
 import (
 	"database/sql"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -19,8 +20,18 @@ func ReadSlowQueryFromTable(db *sql.DB, outTimeLayout string, startTime, endTime
 	startTimeDB := startTime.Format(dbTimestampLayout)
 	endTimeDB := endTime.Format(dbTimestampLayout)
 
-	/* query slow log */
-	slowQueries, err := Vquery(db, "SELECT * FROM mysql.slow_log WHERE start_time BETWEEN ? and ?", startTimeDB, endTimeDB)
+	/**
+	 * query slow log
+	 * note the start_time is using the UNIX_TIMESTAMP so that we have no need to check the timme-zone config of mysqld. */
+
+	slowQueries, err := Vquery(db, `SELECT UNIX_TIMESTAMP(start_time) as start_timestamp,
+										   user_host,
+										   query_time,
+										   lock_time,
+										   rows_sent,
+										   rows_examined,
+										   sql_text
+										   FROM mysql.slow_log WHERE start_time BETWEEN ? and ?`, startTimeDB, endTimeDB)
 	if err != nil {
 		err = errors.Wrap(err, "Failed to query mysql.slow_log")
 		return
@@ -50,11 +61,15 @@ func ReadSlowQueryFromTable(db *sql.DB, outTimeLayout string, startTime, endTime
 		// line1: time (local/utc)
 		// line4: timestamp
 		// db timestamp -> time.Time -> local/utc
-		t, err := time.Parse(dbTimestampLayout, slowq["start_time"])
+
+		startTsRepr := strings.Split(slowq["start_timestamp"], ".")[0] // only consider the seconds part
+
+		startTs, err := strconv.ParseInt(startTsRepr, 10, 64)
 		if err != nil {
-			err = errors.Wrapf(err, "Failed to parse db timestamp: %s", slowq["start_time"])
-			return "", err
+			err = errors.Wrapf(err, "Failed to convert string: %s to int", startTsRepr)
 		}
+		t := time.Unix(startTs, 0)
+
 		switch tsType {
 		case "SYSTEM":
 			t = t.Local()

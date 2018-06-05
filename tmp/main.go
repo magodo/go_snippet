@@ -1,67 +1,108 @@
 package main
 
 import (
-	"database/sql"
-	"fmt"
+	"archive/tar"
+	"compress/gzip"
+	"io"
 	"log"
+	"os"
+	"path/filepath"
 
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/pkg/errors"
 )
 
 func main() {
-
-	db, err := sql.Open("mysql", "root:123@tcp(127.0.0.1:3306)/udb")
+	err := tgzfiles("foo.tgz", "./bar", "./foo", "foo.py")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	outs, err := Vquery("show variables like 'log_timestamps'", db)
-	if err != nil {
-		log.Fatal(err)
-	}
-	if outs == nil {
-		fmt.Println("No match")
-	}
 }
 
-func Vquery(query string, db *sql.DB) (results []map[string]string, err error) {
-	rows, err := db.Query(query)
+func tgzfiles(out string, files ...string) (err error) {
+
+	pr, pw, err := os.Pipe()
 	if err != nil {
-		err = errors.Wrapf(err, "query %s failed", query)
+		err = errors.Wrap(err, "Failed to create pipe")
 		return
 	}
-	defer rows.Close()
+	defer pr.Close()
 
-	cols, err := rows.Columns()
-	if err != nil {
-		err = errors.Wrap(err, "get column failed")
-		return
-	}
+	echannel := make(chan error)
+	go func() {
+		var err error
 
-	for rows.Next() {
-		colValues := make([]interface{}, len(cols))
-		for i := 0; i < len(colValues); i++ {
-			colValues[i] = new(sql.RawBytes)
-		}
+		defer func() {
+			echannel <- err
+		}()
 
-		err = rows.Scan(colValues...)
+		// close pipe write end after copying files into pipe
+		defer pw.Close()
+
+		gw := gzip.NewWriter(pw)
+		defer gw.Close()
+
+		err = tarfiles(gw, files...)
 		if err != nil {
-			err = errors.Wrap(err, "scan slave status failed")
-			return
+			err = errors.Wrapf(err, "Failed to tar files: %s", files)
 		}
+	}()
 
-		result := make(map[string]string, len(cols))
-		for i := 0; i < len(cols); i++ {
-			result[cols[i]] = string(*colValues[i].(*sql.RawBytes))
-		}
-		results = append(results, result)
+	outf, _ := os.Create(out)
+	defer outf.Close()
+
+	io.Copy(outf, pr)
+
+	return <-echannel
+}
+
+func tarfiles(w io.Writer, files ...string) (err error) {
+	//fmt.Printf("tarIt: %s : BEGIN\n", files)
+	//defer fmt.Printf("tarIt: %s : END\n", files)
+
+	tw := tar.NewWriter(w)
+	defer tw.Close()
+
+	for _, file := range files {
+		err = filepath.Walk(file, func(path string, info os.FileInfo, inerr error) (err error) {
+			if inerr != nil {
+				err = errors.Wrapf(err, "Something wrong when walking through %s", path)
+				return
+			}
+			if info.IsDir() {
+				return
+			}
+			return tarfile(tw, path)
+		})
 	}
 
-	err = rows.Err()
+	return
+}
+
+func tarfile(w *tar.Writer, file string) (err error) {
+	//fmt.Printf("tarAddFile: %s : BEGIN\n", file)
+	//defer fmt.Printf("tarAddFile: %s : END\n", file)
+
+	f, err := os.Open(file)
 	if err != nil {
-		err = errors.Wrap(err, "something failed during slave status rows operation")
+		err = errors.Wrapf(err, "Failed to open %s", file)
 		return
 	}
+	defer f.Close()
+
+	info, err := os.Stat(file)
+	if err != nil {
+		err = errors.Wrapf(err, "Failed to stat %s", file)
+		return
+	}
+
+	w.WriteHeader(&tar.Header{
+		Name:    file,
+		Size:    info.Size(),
+		Mode:    int64(info.Mode()),
+		ModTime: info.ModTime(),
+	})
+
+	_, err = io.Copy(w, f)
 	return
 }
