@@ -2,21 +2,57 @@ package main
 
 import (
 	"archive/tar"
+	"bytes"
 	"compress/gzip"
+	"fmt"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 
 	"github.com/pkg/errors"
 )
 
-func main() {
-	err := tgzfiles("foo.tgz", "./bar", "./foo", "foo.py")
-	if err != nil {
-		log.Fatal(err)
-	}
+type MyReader string
 
+var isFirtTime = true
+
+func (r *MyReader) Read(p []byte) (n int, err error) {
+	if isFirtTime {
+		isFirtTime = false
+		p[0] = 'a'
+		return 1, io.EOF
+	}
+	return 0, io.EOF
+}
+
+func main() {
+	//buf := new(bytes.Buffer)
+	//gw := gzip.NewWriter(buf)
+	//gw.Write([]byte{'a'})
+	//gw.Close()
+	//f, _ := os.Create("a.gz")
+	//defer f.Close()
+	//f.Write(buf.Bytes())
+	//fmt.Println(hex.Dump(buf.Bytes()))
+
+	//f, err := os.Open("a.gz")
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//gr, err := gzip.NewReader(f)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//_, err = io.Copy(buf, gr)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//fmt.Println(buf)
+
+	buf := new(bytes.Buffer)
+	buf.Write([]byte("abcdef"))
+	buf.Truncate(2)
+	fmt.Println(buf.Bytes())
 }
 
 func tgzfiles(out string, files ...string) (err error) {

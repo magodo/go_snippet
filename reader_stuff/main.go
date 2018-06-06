@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"os/exec"
 	"strings"
@@ -89,13 +90,36 @@ func test_child_proc(r io.Reader) {
 	}
 }
 
-func main() {
+func main1() {
 	src := strings.NewReader("abc")
 	r := myio.NewStreamReader(src)
 	//test_break_writer(r)
 	test_child_proc(r)
 	fmt.Println(r.N)
 	fmt.Println(r.GetMD5())
+}
+
+func main2() {
+	f1, err := os.Open("random.bin")
+	if err != nil {
+		log.Fatal(err)
+	}
+	r := myio.NewGzReader(f1)
+
+	f, err := os.Create("bar.gz")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	n, err := io.Copy(f, r)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Copied: ", n)
+}
+
+func main() {
+	main2()
 }
 
 ////////////
