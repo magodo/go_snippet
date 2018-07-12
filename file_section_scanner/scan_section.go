@@ -40,9 +40,9 @@ func ScanFile(path string, secFunc SectionStatusFunc) (contents []string, err er
 			if err == io.EOF {
 				if isInSection {
 					// finish this section and return
-					contents = append(contents, strings.Join(lineOfSection, "\n"))
-					return contents, nil
+					contents = append(contents, strings.Join(lineOfSection, ""))
 				}
+				return contents, nil
 			} else {
 				err = errors.Wrapf(err, "Failed to read string up to new line: %s", err)
 				return nil, err
@@ -53,7 +53,7 @@ func ScanFile(path string, secFunc SectionStatusFunc) (contents []string, err er
 		case HitMatchedSection:
 			if isInSection {
 				// finish last section
-				contents = append(contents, strings.Join(lineOfSection, "\n"))
+				contents = append(contents, strings.Join(lineOfSection, ""))
 			}
 			// add this line into new section
 			lineOfSection = []string{line}
@@ -62,7 +62,7 @@ func ScanFile(path string, secFunc SectionStatusFunc) (contents []string, err er
 		case HitNonMatchedSection:
 			if isInSection {
 				// finish last section
-				contents = append(contents, strings.Join(lineOfSection, "\n"))
+				contents = append(contents, strings.Join(lineOfSection, ""))
 			}
 			isInSection = false
 
@@ -71,6 +71,5 @@ func ScanFile(path string, secFunc SectionStatusFunc) (contents []string, err er
 				lineOfSection = append(lineOfSection, line)
 			}
 		}
-
 	}
 }

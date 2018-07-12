@@ -38,7 +38,7 @@ func (r *TgzReader) Read(b []byte) (n int, err error) {
 //                         +---------------+
 //          +-------+      | +--------+    |
 //          |    +--+------+-+--+     |    |
-//   <-read |tgzr|r | PIPE | |w | tar |gzip| <- write -
+//   <-read |    |r | PIPE | |w | gzip|tar | <- write
 //          |    +--+------|-+--+     |    |
 //          +-------+      | +--------+    |
 //                         +---------------+

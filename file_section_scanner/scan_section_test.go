@@ -1,10 +1,10 @@
 package section_scanner
 
 import (
+	"fmt"
 	"regexp"
+	"strings"
 	"testing"
-
-	"github.com/davecgh/go-spew/spew"
 )
 
 func TestScanSection(t *testing.T) {
@@ -13,7 +13,8 @@ func TestScanSection(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	spew.Dump(outputs)
+	fmt.Println(len(outputs))
+	fmt.Println(strings.Join(outputs, ""))
 }
 
 func sectionFunc(line string) (status SectionStatus) {
@@ -24,7 +25,8 @@ func sectionFunc(line string) (status SectionStatus) {
 		return NoHitSection
 	}
 
-	if matches[1] == "1" || matches[1] == "3" {
+	if matches[1] == "1" || matches[1] == "3" || matches[1] == "4" || matches[1] == "5" {
+		//if matches[1] == "1" {
 		return HitMatchedSection
 	}
 

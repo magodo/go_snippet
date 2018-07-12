@@ -118,8 +118,25 @@ func main2() {
 	fmt.Println("Copied: ", n)
 }
 
+func main3() {
+	r, err := myio.NewTgzReader("a.sh")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	f, err := os.Create("foo.tgz")
+	if err != nil {
+		log.Fatal(err)
+	}
+	n, err := io.Copy(f, r)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Copied: ", n)
+}
+
 func main() {
-	main2()
+	main3()
 }
 
 ////////////
