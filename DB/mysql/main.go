@@ -1,24 +1,44 @@
 package main
 
 import (
+	"context"
 	"database/sql"
+	"fmt"
 	"log"
-	"math"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
 func main() {
-	db, err := sql.Open("mysql", "root:123@tcp(127.0.0.1:3306)/foobar")
+	//db, err := sql.Open("mysql", "root:123@tcp(123.125.115.119:3306)/foobar")
+	db, err := sql.Open("mysql", "ucloudbackup:zfDlU8fzJB@tcp(117.50.9.241:3306)/test?timeout=3s")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 
-	_, err = db.Exec("INSERT INTO bar(val) values(?)", uint64(math.MaxUint64))
-	if err != nil {
-		log.Fatal(err)
+	for {
+		//ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		//defer cancel()
+		ctx := context.Background()
+		err = db.PingContext(ctx)
+		fmt.Println(err)
+		time.Sleep(3 * time.Second)
 	}
+
+	//name := ""
+	//err = db.QueryRow("SELECT name FROM zoo where age = 12").Scan(&name)
+	//if err != nil {
+	//	if err != sql.ErrNoRows {
+	//		log.Fatal(err)
+	//	}
+	//	fmt.Println("no row...")
+	//}
+	//_, err = db.Exec("INSERT INTO bar(val) values(?)", uint64(math.MaxUint64))
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
 
 	//------------------------------------------
 	//row, err := db.Query("SELECT name, age from zoo")

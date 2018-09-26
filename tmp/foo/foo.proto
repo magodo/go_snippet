@@ -2,7 +2,4 @@ syntax = "proto2";
 package foo;
 message Foo {
     required int32 i = 1;
-    required string s = 2;
-    optional uint32 u = 3;
-    repeated int32 li = 4;
 };
