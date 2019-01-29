@@ -1,5 +1,0 @@
-syntax = "proto2";
-package foo;
-message Foo {
-    required int32 i = 1;
-};

@@ -1,31 +1,29 @@
 package main
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
 	"log"
-	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
 func main() {
-	//db, err := sql.Open("mysql", "root:123@tcp(123.125.115.119:3306)/foobar")
-	db, err := sql.Open("mysql", "ucloudbackup:zfDlU8fzJB@tcp(117.50.9.241:3306)/test?timeout=3s")
+	db, err := sql.Open("mysql", "root:123@tcp(localhost:3306)/foobar")
+	//db, err := sql.Open("mysql", "ucloudbackup:zfDlU8fzJB@tcp(117.50.9.241:3306)/test?timeout=3s")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 
-	for {
-		//ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-		//defer cancel()
-		ctx := context.Background()
-		err = db.PingContext(ctx)
-		fmt.Println(err)
-		time.Sleep(3 * time.Second)
-	}
+	//for {
+	//	//ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	//	//defer cancel()
+	//	ctx := context.Background()
+	//	err = db.PingContext(ctx)
+	//	fmt.Println(err)
+	//	time.Sleep(3 * time.Second)
+	//}
 
 	//name := ""
 	//err = db.QueryRow("SELECT name FROM zoo where age = 12").Scan(&name)
@@ -41,25 +39,26 @@ func main() {
 	//}
 
 	//------------------------------------------
-	//row, err := db.Query("SELECT name, age from zoo")
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
+	row, err := db.Query("SELECT name, age from zoo")
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	//defer row.Close()
-	//for row.Next() {
-	//	var name sql.NullString
-	//	var age int
-	//	err := row.Scan(&name, &age)
-	//	if err != nil {
-	//		log.Fatal(err)
-	//	}
-	//	if !name.Valid {
-	//		fmt.Println("name is nil when agen = ", age)
-	//	} else {
-	//		fmt.Println("name = ", name)
-	//	}
-	//}
+	defer row.Close()
+	for row.Next() {
+		var name string
+		var age int
+		err := row.Scan(&name, &age)
+		if err != nil {
+			log.Fatal(err)
+		}
+		//if !name.Valid {
+		//	fmt.Println("name is nil when agen = ", age)
+		//} else {
+		//	fmt.Println("name = ", name)
+		//}
+		fmt.Println("name = ", name)
+	}
 
 	//-----------------------------------------
 	//_, _ = db.Exec(`INSERT INTO t_db_backup VALUES
