@@ -13,23 +13,16 @@ func gen(ctx context.Context, nums ...int) <-chan int {
 	go func() {
 		defer close(out)
 		for _, n := range nums {
-		loop:
-			// try to add number to out channel until ctx is Done
-			for ctx.Err() == nil {
-				select {
-				case out <- n:
-					break loop
-				case <-ctx.Done():
-					switch ctx.Err() {
-					case context.Canceled:
-						fmt.Println("gen: canceld")
-					case context.DeadlineExceeded:
-						fmt.Println("gen: timeout")
-					}
-					return
-				default:
-					fmt.Printf("blocking in gen: %d\n", n)
+			select {
+			case out <- n:
+			case <-ctx.Done():
+				switch ctx.Err() {
+				case context.Canceled:
+					fmt.Println("gen: canceld")
+				case context.DeadlineExceeded:
+					fmt.Println("gen: timeout")
 				}
+				return
 			}
 		}
 	}()
@@ -41,22 +34,16 @@ func sq(ctx context.Context, in <-chan int) <-chan int {
 	go func() {
 		defer close(out)
 		for n := range in {
-		loop:
-			for ctx.Err() == nil {
-				select {
-				case out <- n * n:
-					break loop
-				case <-ctx.Done():
-					switch ctx.Err() {
-					case context.Canceled:
-						fmt.Println("sq: canceld")
-					case context.DeadlineExceeded:
-						fmt.Println("sq: timeout")
-					}
-					return
-				default:
-					fmt.Printf("blocking in sq: %d\n", n)
+			select {
+			case out <- n * n:
+			case <-ctx.Done():
+				switch ctx.Err() {
+				case context.Canceled:
+					fmt.Println("sq: canceld")
+				case context.DeadlineExceeded:
+					fmt.Println("sq: timeout")
 				}
+				return
 			}
 		}
 	}()
@@ -70,22 +57,16 @@ func merge(ctx context.Context, cs ...<-chan int) <-chan int {
 	output := func(c <-chan int) {
 		defer wg.Done()
 		for n := range c {
-		loop:
-			for ctx.Err() == nil {
-				select {
-				case out <- n:
-					break loop
-				case <-ctx.Done():
-					switch ctx.Err() {
-					case context.Canceled:
-						fmt.Println("merge: canceld")
-					case context.DeadlineExceeded:
-						fmt.Println("merge: timeout")
-					}
-					return
-				default:
-					fmt.Printf("blocing in merge: %d\n", n)
+			select {
+			case out <- n:
+			case <-ctx.Done():
+				switch ctx.Err() {
+				case context.Canceled:
+					fmt.Println("merge: canceld")
+				case context.DeadlineExceeded:
+					fmt.Println("merge: timeout")
 				}
+				return
 			}
 		}
 	}
@@ -102,6 +83,7 @@ func merge(ctx context.Context, cs ...<-chan int) <-chan int {
 	return out
 }
 
+/*
 func mergeBuggy(cs ...<-chan int) <-chan int {
 	out := make(chan int)
 
@@ -127,6 +109,7 @@ func mergeBuggy(cs ...<-chan int) <-chan int {
 
 	return out
 }
+*/
 
 func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
@@ -142,13 +125,11 @@ func main() {
 
 	out := merge(ctx, c1, c2)
 	//out := mergeBuggy(c1, c2)
-	/*
-		for n := range out {
-			fmt.Println(n)
-		}
-	*/
+	for n := range out {
+		fmt.Println(n)
+	}
 
-	fmt.Println(<-out)
+	//fmt.Println(<-out)
 
 	// ctx will be canceled
 	return
