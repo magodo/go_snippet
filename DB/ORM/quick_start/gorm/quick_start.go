@@ -83,6 +83,15 @@ func pg() {
 	//}
 }
 
+type Result struct {
+	Id   int
+	Bar  int
+	Name string
+}
+
+func (r *Result) TableName() string {
+	return "foo"
+}
 func mysql() {
 	db, err := gorm.Open("mysql", "root:123@tcp(127.0.0.1:3306)/test?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
@@ -95,16 +104,15 @@ func mysql() {
 	//}
 	//spew.Dump(foos)
 
-	type Result struct {
-		Id   int
-		Bar  int
-		Name string
-	}
 	var result []Result
 	if err = db.Raw("select id, name, bar from foo").Scan(&result).Error; err != nil {
 		log.Fatal(err)
 	}
 	spew.Dump(result[1].Name)
+
+	var r Result
+	db.Where("id = ?", 1).First(&r)
+	db.Model(&r).Update("name", "b").Update("bar", 2)
 
 	//var name string
 	//raw, _ := sql.Open("mysql", "root:123@tcp(127.0.0.1:3306)/test?")
