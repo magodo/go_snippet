@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	zkConn, chEvt, err := zk.Connect(strings.Split("172.18.0.4:2181,172.18.0.2:2181,172.18.0.3:2181", ","), 10*time.Second) // NOTE: expiration timeout
+	zkConn, chEvt, err := zk.Connect(strings.Split("172.18.0.4:2181,172.18.0.2:2181,172.18.0.3:2181", ","), 3*time.Second) // NOTE: expiration timeout
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -20,7 +20,7 @@ func main() {
 		for {
 			select {
 			case evt := <-chEvt:
-				log.Printf("[Session Watcher] %s", spew.Sprint(evt))
+				log.Printf("[Default Watcher] %s", spew.Sprint(evt))
 			}
 		}
 	}()
