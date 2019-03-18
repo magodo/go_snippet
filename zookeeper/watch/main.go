@@ -2,7 +2,10 @@ package main
 
 import (
 	"log"
+	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
@@ -11,6 +14,9 @@ import (
 )
 
 func main() {
+	c := make(chan os.Signal)
+	signal.Notify(c, syscall.SIGINT)
+
 	zkConn, chEvt, err := zk.Connect(strings.Split("172.18.0.4:2181,172.18.0.2:2181,172.18.0.3:2181", ","), 3*time.Second) // NOTE: expiration timeout
 	if err != nil {
 		log.Fatal(err)
@@ -20,7 +26,7 @@ func main() {
 		for {
 			select {
 			case evt := <-chEvt:
-				log.Printf("[Default Watcher] %s", spew.Sprint(evt))
+				log.Printf("[Default Watcher] %s", spew.Sdump(evt))
 			}
 		}
 	}()
@@ -35,12 +41,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	select {
-	case evt := <-ch:
+	go func() {
+		evt := <-ch
 		log.Printf("[Existence Watcher] %s", spew.Sdump(evt))
-	}
+	}()
 
 	log.Println("press Ctrl-C to quit...")
-	c := make(chan int)
 	<-c
+	zkConn.Close()
 }

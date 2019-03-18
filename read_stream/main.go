@@ -4,7 +4,6 @@ import (
 	"io"
 	"log"
 	"net"
-	"os"
 )
 
 var toQuit = false
@@ -48,7 +47,7 @@ func processClient(conn net.Conn) {
 				return
 			}
 			/* other error */
-			log.Printf("read error", err)
+			log.Println("read error", err)
 			return
 		}
 
@@ -71,7 +70,7 @@ func process(buf []byte, is_new_msg *bool) {
 		log.Printf("[New Message] ")
 		*is_new_msg = false
 	}
-	os.Stdout.Write(buf)
+	log.Println(buf)
 }
 
 func postInterrupt(conn net.Conn) {
