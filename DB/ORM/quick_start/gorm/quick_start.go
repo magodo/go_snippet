@@ -114,6 +114,12 @@ func mysql() {
 	db.Where("id = ?", 1).First(&r)
 	db.Model(&r).Update("name", "b").Update("bar", 2)
 
+	if err = db.Where("id = ?", 3).First(&r).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return
+		}
+	}
+
 	//var name string
 	//raw, _ := sql.Open("mysql", "root:123@tcp(127.0.0.1:3306)/test?")
 	//row, _ := raw.Query("select name from foo")
