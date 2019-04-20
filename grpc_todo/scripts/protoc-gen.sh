@@ -18,7 +18,6 @@ Options:
 
 Arguments:
     api_version         version of api to use (e.g. v1)
-
 EOF
 }
 
@@ -47,7 +46,10 @@ main() {
 
     proto_dir="$MYDIR"/../api/proto/"$api_version"
     output_dir="$MYDIR"/../pkg/api/"$api_version"
-    protoc -I "$proto_dir" --go_out=plugins=grpc:"$output_dir" todo-service.proto
+    swagger_output_dir="$MYDIR"/../api/swagger/"$api_version"
+    protoc -I "$proto_dir" -I "$MYDIR/../third_party" --go_out=plugins=grpc:"$output_dir" todo-service.proto
+    protoc -I "$proto_dir" -I "$MYDIR/../third_party" --grpc-gateway_out=logtostderr=true:"$output_dir" todo-service.proto
+    protoc -I "$proto_dir" -I "$MYDIR/../third_party" --swagger_out=logtostderr=true:"$swagger_output_dir" todo-service.proto
 }
 
 main "$@"

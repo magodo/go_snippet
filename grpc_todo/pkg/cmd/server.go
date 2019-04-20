@@ -9,11 +9,13 @@ import (
 	// mysql driver
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/magodo/go_snippet/grpc_todo/pkg/protocol/grpc"
+	"github.com/magodo/go_snippet/grpc_todo/pkg/protocol/rest"
 	"github.com/magodo/go_snippet/grpc_todo/pkg/service"
 )
 
 type Config struct {
 	GRPCPort string
+	HTTPPort string
 
 	DatastoreDBHost     string
 	DatastoreDBUser     string
@@ -26,6 +28,7 @@ func RunServer() error {
 
 	var cfg Config
 	flag.StringVar(&cfg.GRPCPort, "grpc-port", "", "gRPC port to bind")
+	flag.StringVar(&cfg.HTTPPort, "http-port", "", "http port to bind")
 	flag.StringVar(&cfg.DatastoreDBHost, "db-host", "", "Database host")
 	flag.StringVar(&cfg.DatastoreDBUser, "db-user", "", "Database user")
 	flag.StringVar(&cfg.DatastoreDBPassword, "db-password", "", "Database password")
@@ -48,5 +51,8 @@ func RunServer() error {
 	defer db.Close()
 
 	v1API := service.NewToDoServiceServer(db)
+	go func() {
+		rest.RunServer(ctx, cfg.GRPCPort, cfg.HTTPPort)
+	}()
 	return grpc.RunServer(ctx, v1API, cfg.GRPCPort)
 }
