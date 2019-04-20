@@ -5,7 +5,7 @@ import (
 
 	"fmt"
 
-	"github.com/magodo/go_snippet/grpc_gateway/pkg/api/proto/bar"
+	"github.com/magodo/go_snippet/grpc_gateway/internal/api/proto/bar"
 )
 
 type BarService struct{}

@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 
-	"github.com/magodo/go_snippet/grpc_gateway/pkg/server"
+	"github.com/magodo/go_snippet/grpc_gateway/internal/server"
 )
 
 var (

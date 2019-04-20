@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/magodo/go_snippet/grpc_gateway/pkg/api/proto/bar"
-	"github.com/magodo/go_snippet/grpc_gateway/pkg/api/proto/foo"
+	"github.com/magodo/go_snippet/grpc_gateway/internal/api/proto/bar"
+	"github.com/magodo/go_snippet/grpc_gateway/internal/api/proto/foo"
 	"google.golang.org/grpc"
 )
 

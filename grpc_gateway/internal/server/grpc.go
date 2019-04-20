@@ -4,10 +4,10 @@ import (
 	"log"
 	"net"
 
-	barPb "github.com/magodo/go_snippet/grpc_gateway/pkg/api/proto/bar"
-	fooPb "github.com/magodo/go_snippet/grpc_gateway/pkg/api/proto/foo"
-	"github.com/magodo/go_snippet/grpc_gateway/pkg/api/service/bar"
-	"github.com/magodo/go_snippet/grpc_gateway/pkg/api/service/foo"
+	barPb "github.com/magodo/go_snippet/grpc_gateway/internal/api/proto/bar"
+	fooPb "github.com/magodo/go_snippet/grpc_gateway/internal/api/proto/foo"
+	"github.com/magodo/go_snippet/grpc_gateway/internal/api/service/bar"
+	"github.com/magodo/go_snippet/grpc_gateway/internal/api/service/foo"
 	"google.golang.org/grpc"
 )
 
