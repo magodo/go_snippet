@@ -12,7 +12,7 @@ import (
 
 func Serve() {
 	service := grpc.NewService(
-		micro.Name("go.micro.srv.greeter"),
+		micro.Name("magodo.greeter"),
 		micro.RegisterTTL(time.Second*30),
 		micro.RegisterInterval(time.Second*10),
 	)

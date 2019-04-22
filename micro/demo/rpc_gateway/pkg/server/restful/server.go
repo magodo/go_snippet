@@ -22,5 +22,7 @@ func Serve(endpoint string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	http.ListenAndServe(":8081", mux)
+	if err = http.ListenAndServe(":8081", mux); err != nil {
+		log.Fatal(err)
+	}
 }
