@@ -16,7 +16,7 @@ import (
 func main() {
 
 	host := "localhost"
-	port := "32804"
+	port := "32782"
 	user := "root"
 	script := "scripts/foo.sh"
 	args := []string{"foo", "1 2"}

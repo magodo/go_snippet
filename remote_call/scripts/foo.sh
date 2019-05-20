@@ -6,7 +6,6 @@
 # Description:
 #########################################################################
 
-set -x
 usage() {
     cat << EOF
 Usage: ./${MYNAME} [options] name age
@@ -31,4 +30,5 @@ name: $name
 age : $age
 EOF
     env
+    sleep 100
 }
