@@ -58,49 +58,47 @@ func main() {
 		log.Fatal(err)
 	}
 
-	/*
-		res, err := Vquery(db, "SELECT * FROM pg_stat_replication where client_addr = $1", "172.20.0.3")
+	res, err := Vquery(db, "SELECT * FROM pg_stat_replication where client_addr = $1", "172.20.0.3")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(res[0]["state"])
+
+	rows, err := db.Query("SELECT * FROM pg_stat_replication")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		stat := replStat{}
+		err := rows.Scan(
+			&stat.pid,
+			&stat.usesysid,
+			&stat.usename,
+			&stat.application_name,
+			&stat.client_addr,
+			&stat.client_hostname,
+			&stat.client_port,
+			&stat.backend_start,
+			&stat.backend_xmin,
+			&stat.state,
+			&stat.sent_location,
+			&stat.write_location,
+			&stat.flush_location,
+			&stat.replay_location,
+			&stat.sync_priority,
+			&stat.sync_state,
+		)
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Println(res[0]["state"])
 
-		rows, err := db.Query("SELECT * FROM pg_stat_replication")
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer rows.Close()
+		fmt.Println(stat)
+	}
 
-		for rows.Next() {
-			stat := replStat{}
-			err := rows.Scan(
-				&stat.pid,
-				&stat.usesysid,
-				&stat.usename,
-				&stat.application_name,
-				&stat.client_addr,
-				&stat.client_hostname,
-				&stat.client_port,
-				&stat.backend_start,
-				&stat.backend_xmin,
-				&stat.state,
-				&stat.sent_location,
-				&stat.write_location,
-				&stat.flush_location,
-				&stat.replay_location,
-				&stat.sync_priority,
-				&stat.sync_state,
-			)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			fmt.Println(stat)
-		}
-
-		err = rows.Err()
-		if err != nil {
-			log.Fatal(err)
-		}
-	*/
+	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
