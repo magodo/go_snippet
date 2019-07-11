@@ -7,7 +7,7 @@ import (
 
 func mysqlDumpQuery(stmt string, args ...interface{}) (fullStmt string, err error) {
 	sms := regexp.MustCompile(`\?`).FindAllStringIndex(stmt, -1)
-	firstIdx := 0
+	lastIdx := 0
 	out := ""
 	i := 0
 	for _, sm := range sms {
@@ -20,9 +20,10 @@ func mysqlDumpQuery(stmt string, args ...interface{}) (fullStmt string, err erro
 		default:
 			argStr = fmt.Sprintf("%v", arg)
 		}
-		out = out + stmt[firstIdx:startIdx] + argStr
-		firstIdx = endIdx
+		out = out + stmt[lastIdx:startIdx] + argStr
+		lastIdx = endIdx
 		i++
 	}
+	out = out + stmt[lastIdx:len(stmt)]
 	return out, nil
 }

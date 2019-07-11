@@ -8,7 +8,7 @@ import (
 
 func showPostgreSQLStmt(stmt string, args ...interface{}) (string, error) {
 	sms := regexp.MustCompile(`\$\d+`).FindAllStringIndex(stmt, -1)
-	firstIdx := 0
+	lastIdx := 0
 	out := ""
 	for _, sm := range sms {
 		startIdx, endIdx := sm[0], sm[1]
@@ -24,8 +24,9 @@ func showPostgreSQLStmt(stmt string, args ...interface{}) (string, error) {
 		default:
 			argStr = fmt.Sprintf("%v", arg)
 		}
-		out = out + stmt[firstIdx:startIdx] + argStr
-		firstIdx = endIdx
+		out = out + stmt[lastIdx:startIdx] + argStr
+		lastIdx = endIdx
 	}
+	out = out + stmt[lastIdx:len(stmt)]
 	return out, nil
 }

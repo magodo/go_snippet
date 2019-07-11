@@ -2,10 +2,12 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 
+	"github.com/davecgh/go-spew/spew"
 	_ "github.com/go-sql-driver/mysql"
+
+	"foo/mylib"
 )
 
 func main() {
@@ -39,26 +41,26 @@ func main() {
 	//}
 
 	//------------------------------------------
-	row, err := db.Query("SELECT name, age from zoo")
-	if err != nil {
-		log.Fatal(err)
-	}
+	//row, err := db.Query("SELECT name, age from zoo")
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
 
-	defer row.Close()
-	for row.Next() {
-		var name string
-		var age int
-		err := row.Scan(&name, &age)
-		if err != nil {
-			log.Fatal(err)
-		}
-		//if !name.Valid {
-		//	fmt.Println("name is nil when agen = ", age)
-		//} else {
-		//	fmt.Println("name = ", name)
-		//}
-		fmt.Println("name = ", name)
-	}
+	//defer row.Close()
+	//for row.Next() {
+	//	var name string
+	//	var age int
+	//	err := row.Scan(&name, &age)
+	//	if err != nil {
+	//		log.Fatal(err)
+	//	}
+	//	//if !name.Valid {
+	//	//	fmt.Println("name is nil when agen = ", age)
+	//	//} else {
+	//	//	fmt.Println("name = ", name)
+	//	//}
+	//	fmt.Println("name = ", name)
+	//}
 
 	//-----------------------------------------
 	//_, _ = db.Exec(`INSERT INTO t_db_backup VALUES
@@ -108,5 +110,10 @@ func main() {
 	//}
 
 	//fmt.Println(showResults["Slave_IO_Running"] == "Connecting")
+	result, err := mylib.Vquery(db, "show slave status")
+	if err != nil {
+		log.Fatal(err)
+	}
+	spew.Dump(result)
 
 }

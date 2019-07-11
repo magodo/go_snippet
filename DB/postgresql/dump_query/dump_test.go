@@ -18,6 +18,11 @@ func TestFoo(t *testing.T) {
 			[]interface{}{"a", 2, 3, 4, 5, 6, 7, 8, 9, "b"},
 			`'a','b'`,
 		},
+		{
+			`select * from (select * from a where id = $1)`,
+			[]interface{}{"a"},
+			`select * from (select * from a where id = 'a')`,
+		},
 	}
 
 	for _, c := range cases {

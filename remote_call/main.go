@@ -5,6 +5,7 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"net"
 	"os"
 	"path/filepath"
 	"strings"
@@ -62,7 +63,7 @@ func main() {
 	}
 
 	// connect
-	client, err := ssh.Dial("tcp", host+":"+port, config)
+	client, err := ssh.Dial("tcp", net.JoinHostPort(host, port), config)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -13,6 +13,11 @@ func TestFoo(t *testing.T) {
 			[]interface{}{"a", 123, "$"},
 			`'a',123,'$'`,
 		},
+		{
+			`select * from (select * from t where i = ?)`,
+			[]interface{}{"a"},
+			`select * from (select * from t where i = 'a')`,
+		},
 	}
 
 	for _, c := range cases {
