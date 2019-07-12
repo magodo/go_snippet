@@ -42,11 +42,16 @@ func (s *memCache) Get(key string) (*cache.Record, error) {
 	}
 
 	d := time.Since(v.c)
-	if v.r.Expiry > time.Duration(0) && d > v.r.Expiry {
-		return nil, cache.ErrCacheMiss
+
+	// check expiry
+	if v.r.Expiry > time.Duration(0) {
+		if d > v.r.Expiry {
+			return nil, cache.ErrCacheMiss
+		}
+		// update expiry
+		v.r.Expiry -= d
+		v.c = time.Now()
 	}
 
-	v.r.Expiry -= d
-	v.c = time.Now()
 	return v.r, nil
 }
