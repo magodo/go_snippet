@@ -1,6 +1,8 @@
 package tree
 
-import "errors"
+import (
+	"errors"
+)
 
 type Node struct {
 	Value  interface{}
@@ -84,6 +86,119 @@ func (tree *Bst) Insert(data interface{}) (err error) {
 }
 
 /////////////////////// FIND /////////////////////
+
+type dataContext struct {
+	val    interface{}
+	parent *Node
+}
+
+func (node *Node) FindSmallestNode() (*Node, error) {
+	if node == nil {
+		return nil, errors.New("node is nil")
+	}
+	if node.Left == nil {
+		return node, nil
+	}
+	n := node.Left
+	for ; n.Left != nil; n = n.Left {
+	}
+	return n, nil
+}
+
+func (node *Node) FindBiggestNode() (*Node, error) {
+	if node == nil {
+		return nil, errors.New("node is nil")
+	}
+	if node.Right == nil {
+		return node, nil
+	}
+	n := node.Right
+	for ; n.Right != nil; n = n.Right {
+	}
+	return n, nil
+}
+
+func (node *Node) FindNearestAscendant() (*Node, error) {
+	if node == nil {
+		return nil, errors.New("node is nil")
+	}
+	if node.Right != nil {
+		return node.Right.FindSmallestNode()
+	}
+	for n, p := node, node.Parent; p != nil; n, p = p, p.Parent {
+		if n == p.Left {
+			return p, nil
+		}
+	}
+	return nil, errors.New("not found")
+}
+
+func (node *Node) FindNearestDescendant() (*Node, error) {
+	if node == nil {
+		return nil, errors.New("node is nil")
+	}
+	if node.Left != nil {
+		return node.Left.FindBiggestNode()
+	}
+	for n, p := node, node.Parent; p != nil; n, p = p, p.Parent {
+		if n == p.Right {
+			return p, nil
+		}
+	}
+	return nil, errors.New("not found")
+}
+
+func (node *Node) FindNearestNodeAgainstValue(dataCtx dataContext) (*Node, error) {
+	if node == nil {
+		if dataCtx.parent == nil {
+			return nil, errors.New("not found")
+		}
+		return dataCtx.parent, nil
+	}
+	dataCtx.parent = node
+	switch node.Comp(dataCtx.val, node.Value) {
+	case 0:
+		return node, nil
+	case -1:
+		return node.Left.FindNearestNodeAgainstValue(dataCtx)
+	case 1:
+		return node.Right.FindNearestNodeAgainstValue(dataCtx)
+	default:
+		return nil, errors.New("malformed comp function")
+	}
+}
+
+func (tree *Bst) FindNearestDescendantNodeAgainstValue(data interface{}) (*Node, error) {
+	n, err := tree.FindNearestNodeAgainstValue(data)
+	if err != nil {
+		return nil, err
+	}
+	if tree.comp(n.Value, data) < 0 {
+		return n, nil
+	}
+	return n.FindNearestDescendant()
+}
+
+func (tree *Bst) FindNearestAscendantNodeAgainstValue(data interface{}) (*Node, error) {
+	n, err := tree.FindNearestNodeAgainstValue(data)
+	if err != nil {
+		return nil, err
+	}
+	if tree.comp(n.Value, data) > 0 {
+		return n, nil
+	}
+	return n.FindNearestAscendant()
+}
+
+func (tree *Bst) FindNearestNodeAgainstValue(data interface{}) (*Node, error) {
+	if tree.comp == nil {
+		return nil, errors.New("comp function not registered")
+	}
+	if tree.Root == nil {
+		return nil, errors.New("empty tree")
+	}
+	return tree.Root.FindNearestNodeAgainstValue(dataContext{data, nil})
+}
 
 func (node *Node) Find(data interface{}) (*Node, error) {
 	if node == nil {

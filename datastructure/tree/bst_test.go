@@ -2,6 +2,7 @@ package tree
 
 import (
 	"fmt"
+	"log"
 	"testing"
 )
 
@@ -51,6 +52,44 @@ func TestBst(t *testing.T) {
 	node, _ := tree.Find(5)
 	if node.Value != 5 {
 		t.Fatal("find not work as expected")
+	}
+
+	tree.Traverse(func(node *Node) {
+		fmt.Printf("find nearest ascendant for %v: ", node.Value)
+		n, err := node.FindNearestAscendant()
+		if err != nil {
+			fmt.Printf("error: %v", err)
+		} else {
+			fmt.Printf("%v", n.Value)
+		}
+		fmt.Println()
+	})
+
+	tree.Traverse(func(node *Node) {
+		fmt.Printf("find nearest descendant for %v: ", node.Value)
+		n, err := node.FindNearestDescendant()
+		if err != nil {
+			fmt.Printf("error: %v", err)
+		} else {
+			fmt.Printf("%v", n.Value)
+		}
+		fmt.Println()
+	})
+
+	n, err := tree.FindNearestDescendantNodeAgainstValue(3)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if n.Value.(int) != 2 {
+		t.Fatal("find nearest descendant node against 3 failed")
+	}
+
+	n, err = tree.FindNearestAscendantNodeAgainstValue(3)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if n.Value.(int) != 4 {
+		t.Fatal("find nearest descendant node against 3 failed")
 	}
 
 	tree.Traverse(func(node *Node) {
