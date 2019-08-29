@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 
@@ -48,7 +49,7 @@ func NewSM() *SM {
 				fmt.Println("before_event called")
 				switch e.Event {
 				case "23":
-					e.Cancel()
+					e.Cancel(errors.New("foo"))
 				}
 				//spew.Dump(e)
 			},
