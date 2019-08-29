@@ -21,6 +21,7 @@ func (c *cacheChain) Get(key string) (*Record, error) {
 	missCaches := []Cache{}
 	var rec *Record
 	var err error
+	var hitCache bool
 
 	for _, c := range c.caches {
 		rec, err = c.Get(key)
@@ -31,9 +32,15 @@ func (c *cacheChain) Get(key string) (*Record, error) {
 			missCaches = append(missCaches, c)
 			continue
 		}
+		hitCache = true
 		break
 	}
 
+	if !hitCache {
+		return nil, ErrCacheMiss
+	}
+
+	// insert back the hit cache record to the missing caches
 	for _, c := range missCaches {
 		if err := c.Set(rec); err != nil {
 			return nil, err
