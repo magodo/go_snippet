@@ -114,7 +114,7 @@ func (c *remoteCall) Call(ctx context.Context, host string, port int, scripts []
 			if errCmd == nil {
 				lastCmd := "main"
 				for _, arg := range args {
-					lastCmd += " \"" + arg + "\""
+					lastCmd += " '" + arg + "'"
 				}
 				_, errCmd = cmdIn.Write([]byte(lastCmd))
 				if errCmd != nil {

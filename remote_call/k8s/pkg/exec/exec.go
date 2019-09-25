@@ -3,14 +3,15 @@ package exec
 import (
 	"fmt"
 	"io"
+	"log"
+	"os"
+
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/remotecommand"
-	"log"
-	"os"
 )
 
 type Executor interface {
@@ -32,8 +33,8 @@ type executor struct {
 	*Options
 }
 
-func (e *executor) ExecCommands(pod, container string,  commands []string) error {
-	client,err := kubernetes.NewForConfig(e.Config)
+func (e *executor) ExecCommands(pod, container string, commands []string) error {
+	client, err := kubernetes.NewForConfig(e.Config)
 	if err != nil {
 		return fmt.Errorf("failed to new client from config: %v", err)
 	}
@@ -43,7 +44,7 @@ func (e *executor) ExecCommands(pod, container string,  commands []string) error
 		Namespace(e.Namespace).
 		SubResource("exec")
 	if container == "" {
-	// If not specified container name, pick the 1st container in this pod
+		// If not specified container name, pick the 1st container in this pod
 		Pod, err := client.CoreV1().Pods(e.Namespace).Get(pod, metav1.GetOptions{})
 		if err != nil {
 			return fmt.Errorf("failed to get pods: %v", err)
@@ -75,7 +76,7 @@ func (e *executor) ExecCommands(pod, container string,  commands []string) error
 	return err
 }
 
-func (e *executor) ExecScripts(pod, container string,  scripts []string, args ...string) error {
+func (e *executor) ExecScripts(pod, container string, scripts []string, args ...string) error {
 	stdinR, stdinW := io.Pipe()
 	defer stdinR.Close()
 	e.Stdin = stdinR
@@ -109,7 +110,7 @@ func (e *executor) ExecScripts(pod, container string,  scripts []string, args ..
 			if errCmd == nil {
 				lastCmd := "main"
 				for _, arg := range args {
-					lastCmd += " \"" + arg + "\""
+					lastCmd += " '" + arg + "'"
 				}
 				_, errCmd = stdinW.Write([]byte(lastCmd))
 				if errCmd != nil {
