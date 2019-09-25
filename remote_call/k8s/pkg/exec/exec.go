@@ -23,6 +23,7 @@ func NewExecutor(config *rest.Config, opts ...Option) Executor {
 	for _, opt := range opts {
 		opt(options)
 	}
+
 	return &executor{config, options}
 }
 

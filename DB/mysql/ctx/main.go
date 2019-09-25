@@ -12,15 +12,14 @@ import (
 )
 
 func main() {
-	db, err := sql.Open("mysql", "root:123@tcp(179.17.0.2:3306)/foo?timeout=3s")
-	//db, err := sql.Open("mysql", "root:123@tcp(localhost)/foobar?timeout=3s")
+	db, err := sql.Open("mysql", "root:123@tcp(179.17.0.2:3306)/mysql?timeout=3s")
 	if err != nil {
 		log.Fatal(err)
 	}
 	for {
 		for n := 0; n < 10; n++ {
 			ctx, _ := context.WithTimeout(context.Background(), 1*time.Second)
-			_, err = db.ExecContext(ctx, "set global sync_binlog = 1")
+			_, err = db.ExecContext(ctx, "select 1")
 			if err != nil {
 				err = errors.Wrap(err, "failed to query")
 				fmt.Println(err)

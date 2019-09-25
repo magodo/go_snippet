@@ -4,17 +4,15 @@ import (
 	"bytes"
 	"exec/pkg/exec"
 	"io"
-	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/client-go/rest"
 	"log"
-	"os"
-	"path/filepath"
 )
 
 func main() {
-	config, err := clientcmd.BuildConfigFromFlags("", filepath.Join(os.Getenv("HOME"), ".kube", "config"))
-	if err != nil {
-		log.Fatal(err)
-	}
+	//config, err := clientcmd.BuildConfigFromFlags("", filepath.Join(os.Getenv("HOME"), ".kube", "config"))
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
 	cmd := bytes.NewBufferString(`
 a=1
 ((a++))
@@ -26,7 +24,7 @@ echo END
 
 	go func() {
 		n, err := io.Copy(stdin, cmd)
-		if err != nil{
+		if err != nil {
 			log.Fatalf("error occurs after copying %d bytes: %v", n, err)
 		}
 	}()
@@ -36,7 +34,23 @@ echo END
 	//	log.Fatal(err)
 	//}
 
-	err = exec.NewExecutor(config, exec.Stdin(stdin)).ExecScripts("hello-node-78cd77d68f-7scgv", "", []string{
+	const token = "tpwkoa.ci5xco9mh1tqoblt"
+	const url = "https://192.168.99.107:8443"
+
+	config := &rest.Config{
+		Host:    url,
+		APIPath: "v1",
+		ContentConfig: rest.ContentConfig{
+			AcceptContentTypes: "application/json",
+			ContentType:        "application/json",
+		},
+		BearerToken: token,
+		TLSClientConfig: rest.TLSClientConfig{
+			Insecure: true,
+		},
+	}
+
+	err := exec.NewExecutor(config, exec.Stdin(stdin)).ExecScripts("nginx-deployment-547b877857-79k7c", "", []string{
 		"/media/storage/github/go_snippet/remote_call/k8s/test/scripts/utils.sh",
 		"/media/storage/github/go_snippet/remote_call/k8s/test/scripts/main.sh",
 	}, "foo", "bar")
@@ -44,5 +58,3 @@ echo END
 		log.Fatal(err)
 	}
 }
-
-
