@@ -3,8 +3,8 @@ package demo
 import (
 	"time"
 
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
 
 var a int
@@ -61,6 +61,29 @@ func resourceArmDedicatedHost() *schema.Resource {
 			"license_type": {
 				Type:     schema.TypeString,
 				Optional: true,
+			},
+			"hosts": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem:     schema.TypeString,
+			},
+			"foo": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem:     schema.TypeString,
+			},
+			"property": {
+				Type:     schema.TypeList,
+				Optional: true,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"foo": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+					},
+				},
 			},
 			"tags": {},
 		},
