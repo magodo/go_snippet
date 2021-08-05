@@ -2,6 +2,7 @@ package worker
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 
@@ -9,18 +10,19 @@ import (
 )
 
 type task struct {
-	ctx   context.Context
-	input interface{}
-	f     TaskFunc
+	ctx context.Context
+	f   TaskFunc
 }
 
-type TaskFunc func(context.Context, interface{}) (interface{}, error)
+type TaskFunc func(context.Context) (interface{}, error)
 
 type ResultHandler func(interface{}) error
 
-func NewTask(ctx context.Context, input interface{}, f TaskFunc) task {
-	return task{ctx, input, f}
+func NewTask(ctx context.Context, f TaskFunc) task {
+	return task{ctx, f}
 }
+
+var ErrSkipTask = errors.New("skip this task")
 
 type Result struct {
 	Value interface{}
@@ -81,7 +83,7 @@ func (wp *workPool) Run(h ResultHandler) {
 					continue
 				case <-t.ctx.Done():
 				default:
-					v, err := t.f(t.ctx, t.input)
+					v, err := t.f(t.ctx)
 					if err != nil {
 						err = fmt.Errorf("task error: %w", err)
 					}
@@ -101,7 +103,7 @@ func (wp *workPool) Run(h ResultHandler) {
 
 	var once sync.Once
 	go func() {
-		var errors error
+		var result error
 		for res := range wp.resultCh {
 			err := res.Error
 			if err == nil {
@@ -111,14 +113,17 @@ func (wp *workPool) Run(h ResultHandler) {
 				}
 			}
 			if err != nil {
+				if errors.Is(err, ErrSkipTask) {
+					continue
+				}
 				once.Do(func() {
 					close(wp.stopCh)
 				})
-				errors = multierror.Append(errors, err)
+				result = multierror.Append(result, err)
 			}
 		}
 
-		wp.errorCh <- errors
+		wp.errorCh <- result
 	}()
 }
 

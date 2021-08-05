@@ -20,11 +20,11 @@ func TestSuccessfulRun(t *testing.T) {
 	})
 
 	for i := 0; i < 10; i++ {
-		expect = append(expect, i)
+		num := i
+		expect = append(expect, num)
 		if !wp.AddTask(worker.NewTask(
 			context.TODO(),
-			i,
-			func(_ context.Context, v interface{}) (interface{}, error) { return v, nil },
+			func(_ context.Context) (interface{}, error) { return num, nil },
 		)) {
 			break
 		}
@@ -48,15 +48,14 @@ func TestTaskError(t *testing.T) {
 
 	err := errors.New("Error")
 	for i := 0; i < 10; i++ {
+		num := i
 		if !wp.AddTask(worker.NewTask(
 			context.TODO(),
-			i,
-			func(_ context.Context, v interface{}) (interface{}, error) {
-				v = v.(int)
-				if v == 2 {
-					return v, err
+			func(_ context.Context) (interface{}, error) {
+				if num == 2 {
+					return num, err
 				}
-				return v, nil
+				return num, nil
 			},
 		)) {
 			break
@@ -80,11 +79,11 @@ func TestResultHandlerError(t *testing.T) {
 		return nil
 	})
 	for i := 0; i < 10; i++ {
+		num := i
 		if !wp.AddTask(worker.NewTask(
 			context.TODO(),
-			i,
-			func(_ context.Context, v interface{}) (interface{}, error) {
-				return v, nil
+			func(_ context.Context) (interface{}, error) {
+				return num, nil
 			},
 		)) {
 			break
@@ -92,4 +91,40 @@ func TestResultHandlerError(t *testing.T) {
 	}
 
 	require.ErrorIs(t, wp.Done(), err)
+}
+
+func TestSkipTask(t *testing.T) {
+	wp := worker.NewWorkPool(8)
+
+	results := []int{}
+	wp.Run(func(v interface{}) error {
+		v = v.(int)
+		results = append(results, v.(int))
+		return nil
+	})
+
+	expect := []int{}
+	for i := 0; i < 10; i++ {
+		if i != 2 {
+			expect = append(expect, i)
+		}
+		num := i
+		if !wp.AddTask(worker.NewTask(
+			context.TODO(),
+			func(_ context.Context) (interface{}, error) {
+				if num == 2 {
+					return num, worker.ErrSkipTask
+				}
+				return num, nil
+			},
+		)) {
+			break
+		}
+	}
+
+	require.NoError(t, wp.Done())
+
+	// The order in results might diff due to the parallelism nature of the worker pool
+	sort.Ints(results)
+	require.Equal(t, expect, results)
 }
