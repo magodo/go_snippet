@@ -1,7 +1,6 @@
 package worker_test
 
 import (
-	"context"
 	"errors"
 	"sort"
 	"testing"
@@ -22,10 +21,7 @@ func TestSuccessfulRun(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		num := i
 		expect = append(expect, num)
-		if !wp.AddTask(worker.NewTask(
-			context.TODO(),
-			func(_ context.Context) (interface{}, error) { return num, nil },
-		)) {
+		if !wp.AddTask(func() (interface{}, error) { return num, nil }) {
 			break
 		}
 	}
@@ -49,15 +45,12 @@ func TestTaskError(t *testing.T) {
 	err := errors.New("Error")
 	for i := 0; i < 10; i++ {
 		num := i
-		if !wp.AddTask(worker.NewTask(
-			context.TODO(),
-			func(_ context.Context) (interface{}, error) {
-				if num == 2 {
-					return num, err
-				}
-				return num, nil
-			},
-		)) {
+		if !wp.AddTask(func() (interface{}, error) {
+			if num == 2 {
+				return num, err
+			}
+			return num, nil
+		}) {
 			break
 		}
 	}
@@ -80,12 +73,9 @@ func TestResultHandlerError(t *testing.T) {
 	})
 	for i := 0; i < 10; i++ {
 		num := i
-		if !wp.AddTask(worker.NewTask(
-			context.TODO(),
-			func(_ context.Context) (interface{}, error) {
-				return num, nil
-			},
-		)) {
+		if !wp.AddTask(func() (interface{}, error) {
+			return num, nil
+		}) {
 			break
 		}
 	}
@@ -109,15 +99,12 @@ func TestSkipTask(t *testing.T) {
 			expect = append(expect, i)
 		}
 		num := i
-		if !wp.AddTask(worker.NewTask(
-			context.TODO(),
-			func(_ context.Context) (interface{}, error) {
-				if num == 2 {
-					return num, worker.ErrSkipTask
-				}
-				return num, nil
-			},
-		)) {
+		if !wp.AddTask(func() (interface{}, error) {
+			if num == 2 {
+				return num, worker.ErrSkipTask
+			}
+			return num, nil
+		}) {
 			break
 		}
 	}

@@ -1,7 +1,6 @@
 package worker
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"sync"
@@ -9,18 +8,9 @@ import (
 	"github.com/hashicorp/go-multierror"
 )
 
-type task struct {
-	ctx context.Context
-	f   TaskFunc
-}
-
-type TaskFunc func(context.Context) (interface{}, error)
+type task func() (interface{}, error)
 
 type ResultHandler func(interface{}) error
-
-func NewTask(ctx context.Context, f TaskFunc) task {
-	return task{ctx, f}
-}
 
 var ErrSkipTask = errors.New("skip this task")
 
@@ -81,9 +71,8 @@ func (wp *workPool) Run(h ResultHandler) {
 					// might sending a new task to the queue, while all the workers are stopped (if using break).
 					// That results into the AddTask() hang.
 					continue
-				case <-t.ctx.Done():
 				default:
-					v, err := t.f(t.ctx)
+					v, err := t()
 					if err != nil {
 						err = fmt.Errorf("task error: %w", err)
 					}
