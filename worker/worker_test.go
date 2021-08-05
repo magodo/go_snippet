@@ -10,13 +10,19 @@ import (
 )
 
 func TestSuccessfulRun(t *testing.T) {
-	wp := worker.NewWorkPool(8)
-	expect := []int{}
 	results := []int{}
-	wp.Run(func(v interface{}) error {
-		results = append(results, v.(int))
-		return nil
-	})
+
+	wp := worker.NewWorkPool(
+		worker.Option{
+			ResultHandler: func(v interface{}) error {
+				results = append(results, v.(int))
+				return nil
+			},
+		},
+	)
+
+	expect := []int{}
+	wp.Run()
 
 	for i := 0; i < 10; i++ {
 		num := i
@@ -34,13 +40,17 @@ func TestSuccessfulRun(t *testing.T) {
 }
 
 func TestTaskError(t *testing.T) {
-	wp := worker.NewWorkPool(8)
-
 	results := []int{}
-	wp.Run(func(v interface{}) error {
-		results = append(results, v.(int))
-		return nil
-	})
+	wp := worker.NewWorkPool(
+		worker.Option{
+			ResultHandler: func(v interface{}) error {
+				results = append(results, v.(int))
+				return nil
+			},
+		},
+	)
+
+	wp.Run()
 
 	err := errors.New("Error")
 	for i := 0; i < 10; i++ {
@@ -59,18 +69,22 @@ func TestTaskError(t *testing.T) {
 }
 
 func TestResultHandlerError(t *testing.T) {
-	wp := worker.NewWorkPool(8)
-
 	err := errors.New("Error")
 	results := []int{}
-	wp.Run(func(v interface{}) error {
-		v = v.(int)
-		if v == 2 {
-			return err
-		}
-		results = append(results, v.(int))
-		return nil
-	})
+	wp := worker.NewWorkPool(
+		worker.Option{
+			ResultHandler: func(v interface{}) error {
+				v = v.(int)
+				if v == 2 {
+					return err
+				}
+				results = append(results, v.(int))
+				return nil
+			},
+		},
+	)
+
+	wp.Run()
 	for i := 0; i < 10; i++ {
 		num := i
 		if !wp.AddTask(func() (interface{}, error) {
@@ -84,14 +98,18 @@ func TestResultHandlerError(t *testing.T) {
 }
 
 func TestSkipTask(t *testing.T) {
-	wp := worker.NewWorkPool(8)
-
 	results := []int{}
-	wp.Run(func(v interface{}) error {
-		v = v.(int)
-		results = append(results, v.(int))
-		return nil
-	})
+	wp := worker.NewWorkPool(
+		worker.Option{
+			ResultHandler: func(v interface{}) error {
+				v = v.(int)
+				results = append(results, v.(int))
+				return nil
+			},
+		},
+	)
+
+	wp.Run()
 
 	expect := []int{}
 	for i := 0; i < 10; i++ {
