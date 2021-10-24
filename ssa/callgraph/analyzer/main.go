@@ -19,7 +19,7 @@ import (
 func main() {
 	// pkgs, err := loadPackage("/home/magodo/projects/terraform-provider-azurerm", []string{"./internal/services/web"})
 	pwd, _ := os.Getwd()
-	pkgs, err := loadPackage(path.Join(path.Dir(pwd), "analyzee"), []string{"."})
+	pkgs, err := loadPackage(path.Join(path.Dir(pwd), "analyzee"), []string{".", "./lib"})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -46,7 +46,8 @@ func main() {
 
 	graph := cha.CallGraph(prog)
 
-	rootFunc := ssapkgs[0].Members["main"].(*ssa.Function)
+	ssamainpkgs := ssautil.MainPackages(ssapkgs)
+	rootFunc := ssamainpkgs[0].Members["main"].(*ssa.Function)
 	rootNode := graph.Nodes[rootFunc]
 	fmt.Println(AllCalleesOf(rootNode))
 }
